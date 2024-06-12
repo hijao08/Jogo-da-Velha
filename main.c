@@ -83,6 +83,7 @@ int main() {
     int first_game = 1; // Indica se é o primeiro jogo
     int score1 = 0, score2 = 0, draws = 0; // Placar inicial
     int difficulty; // Dificuldade do jogo
+    time_t start_time; // Variável para armazenar o tempo inicial
 
     while (1) {
         int choice = display_menu(&first_game);
@@ -108,89 +109,92 @@ int main() {
             moves = 0;
             player = 'X'; // Começa com o jogador X
 
-            // Loop principal do jogo
-            while (1) {
-                // Imprime o tabuleiro
-                print_board(board);
-
-                // Tempo de jogada dependendo da dificuldade
-                int time_limit;
-                switch (difficulty) {
-                    case 1: // Fácil
-                        time_limit = 20;
-                        break;
-                    case 2: // Médio
-                        time_limit = 10;
-                        break;
-                    case 3: // Difícil
-                        time_limit = 5;
-                        break;
-                    default:
-                        time_limit = 30; // Valor padrão para facilidade
-                        break;
-                }
-
-                // Recebe a jogada do jogador atual
-                printf("Jogador %s (%c), informe a linha e a coluna (Exemplo: 1 1) ou (4 4)para pausar: ", (player == 'X') ? player1 : player2, player);
-                time_t start_time = time(NULL); // Obtém o tempo inicial
-                scanf("%d %d", &row, &col);
-                if (row == 4) {
-                    int choice = pause_game();
-                    if (choice == 1) {
-                        continue; // Continua jogando
-                    } else if (choice == 2) {
-                        break; // Reiniciar o jogo
-                    } else if (choice == 3) {
-                        printf("Saindo do jogo. Ate a proxima!\n");
-                        return 0; // Sair do jogo
-                    }
-                }
-
-                // Verifica se o tempo acabou
-                time_t end_time = time(NULL); // Obtém o tempo atual
-                double elapsed_time = difftime(end_time, start_time); // Calcula o tempo decorrido
-                if (elapsed_time > time_limit) {
-                    printf("Tempo esgotado! Jogador %s (%c) excedeu o limite de tempo.\n", (player == 'X') ? player1 : player2, player);
-                    switch_player(&player); // Troca o jogador
-                    continue; // Continua o loop, permitindo que o próximo jogador faça sua jogada
-                }
-
-                // Verifica se a posição está vazia
-                if (row < 1 || row > 3 || col < 1 || col > 3) {
-                    printf("Posicao invalida. Por favor, escolha uma posicao de 1 a 3.\n");
-                    continue; // Pula para a próximo loop
-                }
-                if (board[row - 1][col - 1] != ' ') {
-                    printf("Posicao ocupada. Por favor, escolha outra.\n");
-                    continue; // Pula para a próximo loop
-                }
-
-                board[row - 1][col - 1] = player; // Coloca a marca do jogador na posição escolhida
-                moves++; // Incrementa o número de jogadas
-
-                // Verifica se o jogador atual ganhou
-                if (check_winner(board, player)) {
-                    print_board(board);
-                    printf("Jogador %s (%c) ganhou!\n", (player == 'X') ? player1 : player2, player);
-                    if (player == 'X') {
-                        score1++; // Incrementa o placar do jogador 1
-                    } else {
-                        score2++; // Incrementa o placar do jogador 2
-                    }
-                    break; // Sai do loop, jogo terminado
-                }
-
-                // Verifica se houve empate
-                if (moves == 9) {
-                    print_board(board);
-                    printf("Empate!\n");
-                    draws++; // Incrementa o número de empates
-                    break; // Sai do loop, jogo terminado
-                }
-
-                // Troca de jogador
-                switch_player(&player);
-            }
+			// Loop principal do jogo
+			while (1) {
+			    // Imprime o tabuleiro
+			    print_board(board);
+			
+			    // Tempo de jogada dependendo da dificuldade
+			    int time_limit;
+			    switch (difficulty) {
+			        case 1: // Fácil
+			            time_limit = 20;
+			            break;
+			        case 2: // Médio
+			            time_limit = 10;
+			            break;
+			        case 3: // Difícil
+			            time_limit = 5;
+			            break;
+			        default:
+			            time_limit = 30; // Valor padrão para facilidade
+			            break;
+			    }
+			
+			    // Recebe a jogada do jogador atual
+			    printf("Jogador %s (%c), informe a linha e a coluna (Exemplo: 1 1) ou (4 4) para pausar: ", (player == 'X') ? player1 : player2, player);
+			    time_t start_time = time(NULL); // Obtém o tempo inicial
+			    while (scanf("%d %d", &row, &col) != 2) {
+			        printf("Entrada invalida. Por favor, informe duas coordenadas numericas separadas por espaco.\n");
+			        while (getchar() != '\n'); // Limpa o buffer de entrada
+			    }
+			    if (row == 4) {
+			        int choice = pause_game();
+			        if (choice == 1) {
+			            continue; // Continua jogando
+			        } else if (choice == 2) {
+			            break; // Reiniciar o jogo
+			        } else if (choice == 3) {
+			            printf("Saindo do jogo. Ate a proxima!\n");
+			            return 0; // Sair do jogo
+			        }
+			    }
+			
+			    // Verifica se o tempo acabou
+			    time_t end_time = time(NULL); // Obtém o tempo atual
+			    double elapsed_time = difftime(end_time, start_time); // Calcula o tempo decorrido
+			    if (elapsed_time > time_limit) {
+			        printf("Tempo esgotado! Jogador %s (%c) excedeu o limite de tempo.\n", (player == 'X') ? player1 : player2, player);
+			        switch_player(&player); // Troca o jogador
+			        continue; // Continua o loop, permitindo que o próximo jogador faça sua jogada
+			    }
+			
+			    // Verifica se a posição está vazia
+			    if (row < 1 || row > 3 || col < 1 || col > 3) {
+			        printf("Posicao invalida. Por favor, escolha uma posicao de 1 a 3.\n");
+			        continue; // Pula para a próximo loop
+			    }
+			    if (board[row - 1][col - 1] != ' ') {
+			        printf("Posicao ocupada. Por favor, escolha outra.\n");
+			        continue; // Pula para a próximo loop
+			    }
+			
+			    board[row - 1][col - 1] = player; // Coloca a marca do jogador na posição escolhida
+			    moves++; // Incrementa o número de jogadas
+			
+			    // Verifica se o jogador atual ganhou
+			    if (check_winner(board, player)) {
+			        print_board(board);
+			        printf("Jogador %s (%c) ganhou!\n", (player == 'X') ? player1 : player2, player);
+			        if (player == 'X') {
+			            score1++; // Incrementa o placar do jogador 1
+			        } else {
+			            score2++; // Incrementa o placar do jogador 2
+			        }
+			        break; // Sai do loop, jogo terminado
+			    }
+			
+			    // Verifica se houve empate
+			    if (moves == 9) {
+			        print_board(board);
+			        printf("Empate!\n");
+			        draws++; // Incrementa o número de empates
+			        break; // Sai do loop, jogo terminado
+			    }
+			
+			    // Troca de jogador
+			    switch_player(&player);
+			}
 
             // Exibe o placar
             display_score(player1, player2, &score1, &score2, &draws);
@@ -201,7 +205,7 @@ int main() {
         } else {
             printf("Opcao invalida. Por favor, escolha 1 ou 2.\n");
         }
-    }
+	}
 
 	return 0;
 }
